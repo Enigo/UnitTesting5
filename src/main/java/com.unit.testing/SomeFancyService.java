@@ -2,7 +2,7 @@ package com.unit.testing;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 class SomeFancyService {
@@ -11,15 +11,15 @@ class SomeFancyService {
         return a + b;
     }
 
-    double divide(double a, double b) {
+    double divide(int a, int b) {
         return a / b;
     }
 
-    Set<String> getAllDevelopers(){
-        return new HashSet<>(Arrays.asList("Ruslan", "Gerd"));
+    Set<String> getAllDevelopers() {
+        return new LinkedHashSet<>(Arrays.asList("Ruslan", "Gerd"));
     }
 
-    EnumSet<Game> getAllGames(){
+    EnumSet<Game> getAllGames() {
         return EnumSet.allOf(Game.class);
     }
 

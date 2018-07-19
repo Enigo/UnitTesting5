@@ -12,7 +12,8 @@ import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.condition.EnabledIf;
+import org.junit.jupiter.api.condition.EnabledOnJre;
+import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -36,34 +37,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // DIFFERENT PACKAGE
 
-// NO RUNNER ANY MORE
+@DisplayName("My test")
 class SomeFancyServiceTest {
 
     private final SomeFancyService service = new SomeFancyService();
 
-    // <editor-fold desc="Intro & Outro">
-    // NO public ANYMORE
+    // <editor-fold desc="Before & After">
+    // NOT public ANYMORE
     @BeforeAll
     static void beforeAll() {
-//        System.out.println("New name is more explicit");
+        // "New name is more explicit"
         System.out.println("In beforeAll");
     }
 
     @AfterAll
     static void afterAll() {
-//        System.out.println("New name is more explicit");
+        // "New name is more explicit"
         System.out.println("In afterAll");
     }
 
     @BeforeEach
     void beforeEach() {
-//        System.out.println("New name is more explicit");
+        // "New name is more explicit"
         System.out.println("In beforeEach");
     }
 
     @AfterEach
     void afterEach() {
-//        System.out.println("New name is more explicit");
+        // "New name is more explicit"
         System.out.println("In afterEach");
     }
     // </editor-fold>
@@ -74,11 +75,11 @@ class SomeFancyServiceTest {
         @Test
         void positiveScenario() {
             final int a = 4, b = 8;
-            final int res = 12;
-//        final int res = 6;
+//            final int res = 12;
+        final int res = 6;
             assertEquals(service.sum(a, b), res, () -> {
                 String m = "Hardly constructed message: ";
-                m += a + " and " + b + " is not " + res;
+                m += a + " plus " + b + " is not " + res;
                 return m;
             });
         }
@@ -88,6 +89,16 @@ class SomeFancyServiceTest {
             assertAll("Positive cases",
                     () -> assertEquals(service.divide(4, 2), 2),
                     () -> assertEquals(service.divide(10, 2), 5),
+                    () -> assertEquals(service.divide(1, 1), 1)
+            );
+        }
+
+        @Test
+        void multiplePositiveScenariosAndOneNegative() {
+            assertAll("Positive cases and one negative",
+                    () -> assertEquals(service.divide(4, 2), 2),
+                    () -> assertEquals(service.divide(10, 2), 5),
+                    () -> assertEquals(service.divide(10, 2), 3),
                     () -> assertEquals(service.divide(1, 1), 1)
             );
         }
@@ -132,7 +143,12 @@ class SomeFancyServiceTest {
 
         @Test
         void testFailsBecauseTimeout() {
-            assertTimeout(Duration.ofMillis(1), () -> Thread.sleep(10));
+            assertTimeout(Duration.ofMillis(100), () -> Thread.sleep(150));
+        }
+
+        @Test
+        void testDoesNotFailBecauseTimeout() {
+            assertTimeout(Duration.ofMillis(100), () -> Thread.sleep(50));
         }
     }
 
@@ -141,27 +157,26 @@ class SomeFancyServiceTest {
     class Sugaring {
         @Test
         @DisplayName("Easy readable space separated name")
-        void testWithIncrediblyLongName() {
+        void testWithIncrediblyLongAndUnreadableName() {
             System.out.println("I'm running with such a beautiful name!");
         }
 
         @Test
-        @Disabled("Just to show")
-            // <-- see how many there are 
+        @Disabled("Just to show that I'm ignored") // <-- see how many there are 
         void skippedTest() {
             System.out.println("I'm not running!");
         }
 
         @Test
-        @EnabledIf("#{systemProperties['java.version'].startsWith('1.8')}")
+        @EnabledOnJre(JRE.JAVA_8)
         void sometimesSkippedTest18() {
             System.out.println("I'm running for Java 8 solely!");
         }
 
         @Test
-        @EnabledIf("#{systemProperties['java.version'].startsWith('1.7')}")
+        @EnabledOnJre(JRE.OTHER)
         void sometimesSkippedTest17() {
-            System.out.println("I'm running for Java 7 solely!");
+            System.out.println("I'm running for Java 7 and below!");
         }
     }
 
@@ -200,7 +215,7 @@ class SomeFancyServiceTest {
         @Test
         @DisplayName("some name")
         void exploringTestInfo(TestInfo info) {
-            System.out.println("DisplayName " + info.getDisplayName() + " TestMethod " + info.getTestMethod().get());
+            System.out.println("DisplayName `" + info.getDisplayName() + "` TestMethod `" + info.getTestMethod().get() + "`");
         }
     }
 
